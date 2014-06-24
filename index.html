@@ -116,7 +116,8 @@
         highlightBorderColor: '#aaa',
         highlightBorderWidth: 0,
         popupTemplate: function(geo, data) {
-          if(data){
+          // console.log(data);
+          if(data && data.numberOfThings != 0){
             return ['<div class="hoverinfo"><h3>' + geo.properties.name + '</h3><h3>',
                     'quantity: ' + data.numberOfThings,
                     '</h3></div>'].join('');
@@ -249,7 +250,7 @@
 
     function resetColors(){
       for (var key in colorJSON){
-        colorJSON[key] = defaultColor;
+        colorJSON[key] = { fillKey: 'defaultFill', numberOfThings: 0};
       }
     }
 
