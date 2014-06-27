@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset=utf-8 />
+  <title>Components</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <!-- jquery -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <!-- mapbox -->
+  <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
+  <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+  <!-- d3 -->
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <!-- c3 -->
+  <script src='https://rawgit.com/masayuki0812/c3/master/c3.js'></script>
+  <link href='https://rawgit.com/masayuki0812/c3/master/c3.css' rel='stylesheet' />
+  <!-- fonts -->
+  <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
+
+  <style>
+  body{
+    width: 800px;
+    margin: 0px auto;
+    text-align: center;
+    padding-bottom: 300px;
+  }
+  h2 {
+    margin-top: 60px;
+    font-family: 'Oswald', Arial;
+    font-weight: 400;
+    /*text-transform: uppercase;*/
+  }
+  </style>
+</head>
+
+<body>
+  <h2>Agency Contribution Per Camp</h2>
+  <div id="chart_1"></div>
+  <h2>Prioritized Food Items</h2>
+  <div id="chart_2"></div>
+  <script>
+    var chart_1 = c3.generate({
+      bindto: '#chart_1',
+      data: {
+        columns: [
+          ['Urban', 200, 40, 25, 40, 60],
+          ['Kakuma', 125, 20, 10, 20, 50],
+          ['Dadaab', 20, 10, 2, 1, 5],
+        ],
+        type: 'bar',
+        groups: [
+          ['Urban', 'Kakuma', 'Dadaab']
+        ]
+      },
+      axis: {
+        x: {
+          type: 'category',
+          categories: ['CNA', 'UNHCR', 'Partners', 'WFP', 'GAP']
+        },
+        y: {
+          label: {
+            text: 'Figures in Millions',
+            position: 'outer-middle'
+          }
+        }
+      },
+      grid: {
+          x: {
+              show: false
+          },
+          y: {
+              show: true
+          }
+      }
+    });
+    var chart_2 = c3.generate({
+      bindto: '#chart_2',
+      data: {
+        columns: [
+          ['Need', 10, 11, 28, 7, 6, 23, 16, 10, 16, 122],
+          ['Contribution', 4, 20, 22, 3, 4, 20, 4, 5, 9, 70],
+          ['Gap', 2, 5, 6, 5, 1, 7, 10, 3, 8, 50],
+        ],
+        type: 'bar'
+      },
+      axis: {
+        x: {
+          type: 'category',
+          categories: ['Water', 'Health', 'Child Protection', 'Shelter', 'Protection']
+        },
+        y: {
+          label: {
+            text: 'Figures in Millions',
+            position: 'outer-middle'
+          }
+        }
+      },
+      grid: {
+          x: {
+              show: false
+          },
+          y: {
+              show: true
+          }
+      }
+    });
+  </script>
+</body>
+
+</html>
