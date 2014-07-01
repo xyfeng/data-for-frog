@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Topics</title>
+  <style>
+    body{
+      margin:0;
+      padding:0;
+      font:12px/17px Arial, sans-serif;
+      background:#efefef;
+      width:100%;
+      height:100%;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="viewport"></canvas>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+
+  <script src="lib/arbor.js"></script>
+  <script src="lib/arbor-tween.js"></script>
+  <!-- drawing -->
+  <script src="lib/arbor-graphics.js"></script>
+  <script src="lib/arbor-renderer.js"></script>
+
+  <script>
+    (function($) {
+      var sys = arbor.ParticleSystem(1000, 400, 1);
+      sys.parameters({
+        gravity: true
+      });
+      sys.renderer = Renderer("#viewport");
+      var data = {
+        nodes: {
+          top: {
+            'color': 'dd3333',
+            'shape': 'dot',
+            'label': '    Topics   '
+          },
+          pop: {
+            'color': 'ccddcc',
+            'label': 'Population'
+          },
+          eco: {
+            'color': 'ccddcc',
+            'label': 'Economic'
+          },
+          hth: {
+            'color': 'ccddcc',
+            'label': 'Health'
+          },
+          fos: {
+            'color': 'ccddcc',
+            'label': 'Food Security'
+          },
+          nut: {
+            'color': 'ccddcc',
+            'label': 'Nutrition'
+          },
+          edu: {
+            'color': 'ccddcc',
+            'label': 'Education'
+          },
+          pro: {
+            'color': 'ccddcc',
+            'label': 'Protection'
+          },
+          wsh: {
+            'color': 'ccddcc',
+            'label': 'Water, Sanitation, and Hygiene'
+          },
+          she: {
+            'color': 'ccddcc',
+            'label': 'Shelter'
+          },
+          log: {
+            'color': 'ccddcc',
+            'label': 'Logistics'
+          },
+          fun: {
+            'color': 'ccddcc',
+            'label': 'Funding'
+          },
+          hum: {
+            'color': 'ccddcc',
+            'label': 'Humanitarian Profile'
+          },
+          att: {
+            'color': 'ccddcc',
+            'label': 'Attribute'
+          },
+          geo: {
+            'color': 'ccddcc',
+            'label': 'Geographic'
+          },
+          oth: {
+            'color': 'ccddcc',
+            'label': 'Other'
+          },
+        },
+        edges: {
+          top: {
+            pop: {},
+            eco: {},
+            hth: {},
+            fos: {},
+            nut: {},
+            edu: {},
+            pro: {},
+            wsh: {},
+            she: {},
+            log: {},
+            fun: {},
+            hum: {},
+            att: {},
+            geo: {},
+            oth: {}
+          }
+        }
+      };
+      sys.graft(data);
+
+    })(this.jQuery)
+  </script>
+
+</body>
+
+</html>
