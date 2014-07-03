@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Map</title>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="http://datamaps.github.io/scripts/datamaps.world.min.js?v=1"></script>
+
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+  <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
+
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 100%;
+      height: 100%;
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Oswald', Arial;
+    }
+    #map_container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    #indicator {
+      position: absolute;
+      top: 10px;
+      left: 10px
+    }
+    .dropdown-menu {
+      height: auto;
+      max-height: 300px;
+      overflow-x: hidden;
+    }
+    #timeline {
+      position: absolute;
+      top: 10px;
+      left: 200px;
+    }
+    #indicator_title {
+      position: absolute;
+      font-size: 18px;
+      width: 100%;
+      bottom: 30px;
+      text-align: center;
+    }
+    #indicator_unit {
+      position: absolute;
+      font-size: 12px;
+      color: #ccc;
+      text-align: center;
+      width: 100%;
+      bottom: 10px;
+      font-weight: 300;
+    }
+    h3{
+      font-size: 10px;
+      line-height: 16px;
+      margin:0;
+      padding:0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map_container"></div>
+  <div class="btn-group" id="indicator">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      Select Indicators <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+    </ul>
+  </div>
+  <div class="btn-group" id="timeline">
+  </div>
+  <h1 id='indicator_title'>World Map<h1>
+  <h2 id='indicator_unit'></h2>
+  <script>
+    var indicator, units;
+    var min, max, median, average;
+    var dataset, valueset;
+    var indicators;
+
+    var colorJSON = {};
+    var defaultColor = '#eee';
+
+    getIndicators();
+
+    var map = new Datamap({
+      element: document.getElementById('map_container'),
+      fills: {
+        HIGH: '#005B7F',
+        LOW: '#4CCBFF',
+        MEDIUM: '#006DCC',
+        defaultFill: defaultColor
+      },
+      data: {
+      },
+      geographyConfig: {
+        highlightOnHover: true,
+        popupOnHover: true,
+        highlightFillColor: '#000',
+        highlightBorderColor: '#aaa',
+        highlightBorderWidth: 0,
+        popupTemplate: function(geo, data) {
+          // console.log(data);
+          if(data && data.numberOfThings != 0){
+            return ['<div class="hoverinfo"><h3>' + geo.properties.name + '</h3><h3>',
+                    'quantity: ' + data.numberOfThings,
+                    '</h3></div>'].join('');
+          }
+          else{
+            return '<div class="hoverinfo"><h3>' + geo.properties.name + '</h3></div>';
+          }
+        }
+      }
+    });
+
+    $('body').on('click', '#indicator .dropdown-menu li > a', function() {
+      var $this = $(this);
+      units = $this.data('unit');
+      resetColors();
+      map.updateChoropleth(colorJSON);
+      $('#timeline').empty();
+      $('#indicator_title').empty().text(this.innerHTML);
+      $('#indicator_unit').empty().text(units);
+      indicator = $this.data('id');
+      // console.log(id);
+      getPeriods(indicator);
+      return;
+    });
+
+    $('body').on('mouseup', '#timeline .btn', function(){
+      var $this = $(this);
+      if(!$this.hasClass('active')){
+        $this.addClass('active').siblings().removeClass('active');
+        var period = $this.text();
+        // console.log(period);
+        getDatasetByIndicatorAndPeriod(indicator, period);
+      }
+      return false;
+    });
+
+    function getIndicators() {
+      var url = 'http://ocha.parseapp.com/getindicators';
+      $.getJSON(url)
+        .done(function(json) {
+          indicators = json;
+          // console.log(json);
+          for (var index in indicators) {
+            var one = indicators[index];
+            $('<li><a href="#" data-id="' + one.indID + '" data-unit="' + one.units + '">' + one.name + '</a></li>').appendTo($('#indicator .dropdown-menu'));
+          }
+        })
+        .fail(function(jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.log("Request Failed: " + err);
+        });
+    }
+
+    function getPeriods(indid) {
+      var url = "http://ocha.parseapp.com/getperiods?indid=" + indid;
+      $.getJSON(url)
+        .done(function(json) {
+          for (var index in json) {
+            var one = json[index];
+            $('<button type="button" class="btn btn-default">' + one + '</button>').appendTo($('#timeline'));
+          }
+        })
+        .fail(function(jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.log("Request Failed: " + err);
+        });
+    }
+
+    function getDatasetByIndicatorAndPeriod(indid, period) {
+      var url = "http://ocha.parseapp.com/getdataset?indid=" + indid + "&period=" + period;
+      $.getJSON(url)
+        .done(function(json) {
+          dataset = json;
+          // console.log(dataset);
+          computeValue();
+        })
+        .fail(function(jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.log("Request Failed: " + err);
+        });
+    }
+
+    function computeValue(){
+      valueset = [];
+      for (var index in dataset){
+        var one = dataset[index];
+        var value = parseFloat(one.value);
+        if(value){
+          valueset.push(value);
+        }
+      }
+      if(valueset.length){
+        min = d3.min(valueset);
+        max = d3.max(valueset);
+        average = d3.mean(valueset);
+        median = d3.median(valueset);
+        console.log('min is: ' + min);
+        console.log('max is: ' + max);
+        console.log('average is: ' + average);
+        console.log('median is: ' + median);
+
+        //update color
+        resetColors();
+
+        for (var index in dataset){
+          var one = dataset[index];
+          var country = one.region;
+          var value = parseFloat(one.value);
+          if(value <= (max-min)*0.34+min){
+            colorJSON[country] = { fillKey: 'LOW', numberOfThings: value};
+          }
+          else if(value >= (max-min)*0.67+min){
+            colorJSON[country] = { fillKey: 'HIGH', numberOfThings: value};
+          }
+          else{
+            colorJSON[country] = { fillKey: 'MEDIUM', numberOfThings: value};
+          }
+        }
+        try{
+          map.updateChoropleth(colorJSON);
+        }
+        catch(err){
+          var text = "There was an error on this page.\n\n";
+          text += "Error description: " + err.message + "\n\n";
+          text += "Click OK to continue.\n\n";
+          alert(text);
+        }
+      }
+    }
+
+    function resetColors(){
+      for (var key in colorJSON){
+        colorJSON[key] = { fillKey: 'defaultFill', numberOfThings: 0};
+      }
+    }
+
+  </script>
+</body>
+
+</html>
