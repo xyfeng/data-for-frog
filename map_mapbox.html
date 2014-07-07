@@ -29,13 +29,22 @@ design: yumiendo.ijchbik8
   <meta charset=utf-8 />
   <title>Mapbox</title>
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <!-- jquery -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <!-- bootstrap -->
+  <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <!-- mapbox -->
   <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
-
+  <!-- mapbox plugins -->
   <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
-
+  <!-- math -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjs/0.25.0/math.min.js'></script>
+  <!-- data -->
   <script src='data/world_json.js'></script>
-
+  <!-- font -->
+  <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
   <style>
     * {
       margin: 0;
@@ -46,27 +55,334 @@ design: yumiendo.ijchbik8
     }
     #map {
       position: absolute;
-      top: 0;
-      bottom: 0;
       width: 100%;
+      height: 100%;
+    }
+    .leaflet-top-pane {
+      pointer-events: none;
+    }
+    .leaflet-popup-pane {
+      z-index: 10;
+    }
+    .leaflet-popup-close-button {
+      display: none;
+     }
+    .leaflet-popup-content-wrapper {
+      pointer-events: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Oswald', Arial;
+    }
+    #indicator {
+      position: absolute;
+      top: 10px;
+      left: 50px
+    }
+    .dropdown-menu {
+      height: auto;
+      max-height: 300px;
+      overflow-x: hidden;
+    }
+    #timeline {
+      position: absolute;
+      top: 10px;
+      left: 200px;
+    }
+    #indicator_title {
+      position: absolute;
+      font-size: 18px;
+      width: 100%;
+      bottom: 30px;
+      text-align: center;
+    }
+    #indicator_unit {
+      position: absolute;
+      font-size: 12px;
+      color: #333;
+      text-align: center;
+      width: 100%;
+      bottom: 10px;
+      font-weight: 300;
+    }
+    h3{
+      font-size: 10px;
+      line-height: 16px;
+      margin:0;
+      padding:0;
     }
   </style>
 </head>
 
 <body>
   <div id='map'></div>
+
+  <div class="btn-group" id="indicator">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+      Select Indicators <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+    </ul>
+  </div>
+  <div class="btn-group" id="timeline">
+  </div>
+  <h1 id='indicator_title'>World Map</h1>
+  <h2 id='indicator_unit'></h2>
+
   <script>
-    var map = L.mapbox.map('map', 'yumiendo.ijchbik8').setView([40, 0], 2);
-    var worldLayer = L.geoJson(worldJSON, {
-      style: {
-          weight: 1,
-          opacity: 0.5,
-          color: 'black',
-          fillOpacity: 0.5,
-          fillColor: 'white'
+    var indicator, units;
+    var min, max, median, average;
+    var dataset, valueset;
+    var indicators;
+
+    var closeTooltip;
+
+    var colorJSON = {};
+    var colorHIGH = '#005B7F',
+        colorLOW = '#4CCBFF',
+        colorMEDIUM = '#006DCC';
+
+    // console.log(worldJSON);
+    var map = L.mapbox.map('map').setView([40, 0], 2);
+
+    var popup = new L.Popup({ autoPan: false });
+
+    var countryLayer = L.geoJson(worldJSON, {
+      style: getStyle,
+      onEachFeature: onEachFeature
+    }).addTo(map);
+
+    function getStyle(feature) {
+      return {
+        weight: 0,
+        fillOpacity: 1,
+        fillColor: '#fff'
+      };
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mousemove: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature
+      });
+    }
+
+    function clearColors(){
+      for (var index in countryLayer._layers){
+        var layer = countryLayer._layers[index];
+        layer.setStyle(getStyle());
       }
-    })
-    .addTo(map);
+    }
+
+    // Set hover colors
+    function highlightFeature(e) {
+      var layer = e.target;
+      var countryID = layer.feature.id;
+
+      if( countryID in colorJSON){
+        popup.setLatLng(e.latlng);
+        popup.setContent('<div class="marker-title">' + layer.feature.properties.name + '</div>' +
+            11 + ' ' + units);
+        if (!popup._map) popup.openOn(map);
+        window.clearTimeout(closeTooltip);
+      }
+      else{
+        closeTooltip = window.setTimeout(function() {
+            map.closePopup();
+        }, 100);
+      }
+
+      layer.setStyle({
+        weight: 1,
+        opacity: 0.2,
+        color: '#ff0000',
+        dashArray: '3',
+        fillOpacity: 0.3,
+        fillColor: '#ff0000'
+      });
+    }
+
+    // A function to reset the colors
+    function resetHighlight(e) {
+      var layer = e.target;
+      var countryID = layer.feature.id;
+      if( countryID in colorJSON ){
+        layer.setStyle(colorJSON[countryID].style);
+      }
+      else{
+        countryLayer.resetStyle(e.target);
+      }
+
+      closeTooltip = window.setTimeout(function() {
+          map.closePopup();
+      }, 100);
+    }
+
+    function zoomToFeature(e) {
+        map.fitBounds(e.target.getBounds());
+    }
+
+    //re-order layers
+    var topPane = map._createPane('leaflet-top-pane', map.getPanes().mapPane);
+    var topLayer = L.mapbox.tileLayer('xyfeng.ijpo6lio').addTo(map);
+    topPane.appendChild(topLayer.getContainer());
+    topLayer.setZIndex(7);
+
+    //DATA
+    function getIndicators() {
+      var url = 'http://ocha.parseapp.com/getindicators';
+      $.getJSON(url)
+        .done(function(json) {
+          indicators = json;
+          // console.log(json);
+          for (var index in indicators) {
+            var one = indicators[index];
+            $('<li><a href="#" data-id="' + one.indID + '" data-unit="' + one.units + '">' + one.name + '</a></li>').appendTo($('#indicator .dropdown-menu'));
+          }
+        })
+        .fail(function(jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.log("Request Failed: " + err);
+        });
+    }
+
+    function getPeriods(indid) {
+      var url = "http://ocha.parseapp.com/getperiods?indid=" + indid;
+      $.getJSON(url)
+        .done(function(json) {
+          for (var index in json) {
+            var one = json[index];
+            $('<button type="button" class="btn btn-default">' + one + '</button>').appendTo($('#timeline'));
+          }
+        })
+        .fail(function(jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.log("Request Failed: " + err);
+        });
+    }
+
+    function getDatasetByIndicatorAndPeriod(indid, period) {
+      var url = "http://ocha.parseapp.com/getdataset?indid=" + indid + "&period=" + period;
+      $.getJSON(url)
+        .done(function(json) {
+          dataset = json;
+          // console.log(dataset);
+          computeValue();
+        })
+        .fail(function(jqxhr, textStatus, error) {
+          var err = textStatus + ", " + error;
+          console.log("Request Failed: " + err);
+        });
+    }
+
+    function computeValue(){
+      colorJSON = {};
+      valueset = [];
+      for (var index in dataset){
+        var one = dataset[index];
+        var value = parseFloat(one.value);
+        if(value){
+          valueset.push(value);
+        }
+      }
+      // console.log(dataset);
+      if(valueset.length){
+        min = math.min(valueset);
+        max = math.max(valueset);
+        average = math.mean(valueset);
+        median = math.median(valueset);
+        console.log('min is: ' + min);
+        console.log('max is: ' + max);
+        console.log('average is: ' + average);
+        console.log('median is: ' + median);
+
+        for (var index in dataset){
+          var one = dataset[index];
+          var country = one.region;
+          var value = parseFloat(one.value);
+          if(value <= (max-min)*0.34+min){
+            colorJSON[country] = {
+              style:{
+                weight: 0,
+                fillOpacity: 1,
+                fillColor: colorLOW
+              },
+              quantity: value
+            };
+          }
+          else if(value >= (max-min)*0.67+min){
+            colorJSON[country] = {
+              style: {
+                weight: 0,
+                fillOpacity: 1,
+                fillColor: colorHIGH
+              },
+              quantity: value
+            };
+          }
+          else{
+            colorJSON[country] = {
+              style: {
+                weight: 0,
+                fillOpacity: 1,
+                fillColor: colorMEDIUM
+              },
+              quantity: value
+            };
+          }
+        }
+        // console.log(colorJSON);
+
+        for (var index in countryLayer._layers){
+          var layer = countryLayer._layers[index];
+          var countryID = layer.feature.id;
+          // console.log(countryID);
+          if(countryID in colorJSON){
+            layer.setStyle(colorJSON[countryID].style);
+          }
+          else{
+            layer.setStyle(getStyle());
+          }
+        }
+      }
+    }
+
+    //Load Data
+    getIndicators();
+
+    //Events
+    $('body').on('click', '#indicator .dropdown-menu li > a', function() {
+      var $this = $(this);
+      units = $this.data('unit');
+      clearColors();
+      $('#timeline').empty();
+      $('#indicator_title').empty().text(this.innerHTML);
+      $('#indicator_unit').empty().text(units);
+      indicator = $this.data('id');
+      // console.log(id);
+      getPeriods(indicator);
+      return;
+    });
+
+
+    $('body').on('mouseup', '#timeline .btn', function(){
+      var $this = $(this);
+      if(!$this.hasClass('active')){
+        $this.addClass('active').siblings().removeClass('active');
+        var period = $this.text();
+        // console.log(period);
+        // clearColors();
+        getDatasetByIndicatorAndPeriod(indicator, period);
+      }
+      return false;
+    });
+
   </script>
 </body>
 
