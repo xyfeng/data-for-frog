@@ -1,3 +1,11 @@
+<!--
+
+http://geoip.smart-ip.net/json?callback=? (http://www.sitepoint.com/client-ip-jquery/)
+http://ipinfodb.com (http://css-tricks.com/snippets/php/detect-location-by-ip/)
+http://ipinfo.io/
+
+-->
+
 <!DOCTYPE html>
 <html>
 
@@ -9,7 +17,10 @@
   <script src="http://datamaps.github.io/scripts/datamaps.world.min.js?v=1"></script>
 
   <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <!--
   <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  -->
+  <link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/lumen/bootstrap.min.css" rel="stylesheet">
 
   <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
 
@@ -34,6 +45,7 @@
       position: relative;
       width: 100%;
       height: 100%;
+      background: #97d7ec;
     }
     #indicator {
       position: absolute;
@@ -60,7 +72,7 @@
     #indicator_unit {
       position: absolute;
       font-size: 12px;
-      color: #ccc;
+      color: #333;
       text-align: center;
       width: 100%;
       bottom: 10px;
@@ -78,7 +90,7 @@
 <body>
   <div id="map_container"></div>
   <div class="btn-group" id="indicator">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
       Select Indicators <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
@@ -102,9 +114,9 @@
     var map = new Datamap({
       element: document.getElementById('map_container'),
       fills: {
-        HIGH: '#005B7F',
-        LOW: '#4CCBFF',
-        MEDIUM: '#006DCC',
+        HIGH: '#159916',
+        LOW: '#DAFF89',
+        MEDIUM: '#59CC5A',
         defaultFill: defaultColor
       },
       data: {
@@ -112,8 +124,8 @@
       geographyConfig: {
         highlightOnHover: true,
         popupOnHover: true,
-        highlightFillColor: '#000',
-        highlightBorderColor: '#aaa',
+        highlightFillColor: '#FF5E21',
+        highlightBorderColor: '#fff',
         highlightBorderWidth: 0,
         popupTemplate: function(geo, data) {
           // console.log(data);
@@ -177,7 +189,7 @@
         .done(function(json) {
           for (var index in json) {
             var one = json[index];
-            $('<button type="button" class="btn btn-default">' + one + '</button>').appendTo($('#timeline'));
+            $('<button type="button" class="btn btn-default btn-xs">' + one + '</button>').appendTo($('#timeline'));
           }
         })
         .fail(function(jqxhr, textStatus, error) {

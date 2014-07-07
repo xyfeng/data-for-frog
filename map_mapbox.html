@@ -33,7 +33,9 @@ design: yumiendo.ijchbik8
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
   <!-- bootstrap -->
   <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <!-- <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"> -->
+  <link href="http://maxcdn.bootstrapcdn.com/bootswatch/3.2.0/lumen/bootstrap.min.css" rel="stylesheet">
+
   <!-- mapbox -->
   <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
@@ -123,7 +125,7 @@ design: yumiendo.ijchbik8
   <div id='map'></div>
 
   <div class="btn-group" id="indicator">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+    <button type="button" class="btn btn-xs btn-default dropdown-toggle" data-toggle="dropdown">
       Select Indicators <span class="caret"></span>
     </button>
     <ul class="dropdown-menu" role="menu">
@@ -143,9 +145,9 @@ design: yumiendo.ijchbik8
     var closeTooltip;
 
     var colorJSON = {};
-    var colorHIGH = '#005B7F',
-        colorLOW = '#4CCBFF',
-        colorMEDIUM = '#006DCC';
+    var colorHIGH = '#159916',
+        colorLOW = '#DAFF89',
+        colorMEDIUM = '#59CC5A';
 
     // console.log(worldJSON);
     var map = L.mapbox.map('map').setView([40, 0], 2);
@@ -201,10 +203,10 @@ design: yumiendo.ijchbik8
       layer.setStyle({
         weight: 1,
         opacity: 0.2,
-        color: '#ff0000',
+        color: '#ccc',
         dashArray: '3',
-        fillOpacity: 0.3,
-        fillColor: '#ff0000'
+        fillOpacity: 1.0,
+        fillColor: '#FF5E21'
       });
     }
 
@@ -258,7 +260,7 @@ design: yumiendo.ijchbik8
         .done(function(json) {
           for (var index in json) {
             var one = json[index];
-            $('<button type="button" class="btn btn-default">' + one + '</button>').appendTo($('#timeline'));
+            $('<button type="button" class="btn btn-xs btn-default">' + one + '</button>').appendTo($('#timeline'));
           }
         })
         .fail(function(jqxhr, textStatus, error) {
