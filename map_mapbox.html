@@ -188,7 +188,7 @@ design: yumiendo.ijchbik8
       if( countryID in colorJSON){
         popup.setLatLng(e.latlng);
         popup.setContent('<div class="marker-title">' + layer.feature.properties.name + '</div>' +
-            11 + ' ' + units);
+            colorJSON[countryID].quantity + ' ' + units);
         if (!popup._map) popup.openOn(map);
         window.clearTimeout(closeTooltip);
       }
