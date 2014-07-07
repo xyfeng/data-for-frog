@@ -107,7 +107,7 @@ http://ipinfo.io/
     var indicators;
 
     var colorJSON = {};
-    var defaultColor = '#eee';
+    var defaultColor = '#fff';
 
     getIndicators();
 
@@ -122,9 +122,11 @@ http://ipinfo.io/
       data: {
       },
       geographyConfig: {
+        borderWidth: 0.5,
+        borderColor: '#aaa',
         highlightOnHover: true,
         popupOnHover: true,
-        highlightFillColor: '#FF5E21',
+        highlightFillColor: '#eee',
         highlightBorderColor: '#fff',
         highlightBorderWidth: 0,
         popupTemplate: function(geo, data) {
