@@ -27,12 +27,11 @@
   <script src="lib/arbor-graphics.js"></script>
   <script src="lib/arbor-renderer.js"></script>
 
+  <script src="data/indicators.js"></script>
+
   <script>
     (function($) {
-      var sys = arbor.ParticleSystem(1000, 400, 1);
-      sys.parameters({
-        gravity: true
-      });
+      var sys = arbor.ParticleSystem(2000, 400, 1, false, 30, 0.02, 0.1);
       sys.renderer = Renderer("#viewport");
       var data = {
         nodes: {
@@ -139,7 +138,7 @@
           }
         }
       };
-      sys.graft(data);
+      sys.graft(indicators);
 
     })(this.jQuery)
   </script>
