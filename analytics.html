@@ -60,6 +60,7 @@
   <h2>Trend Analysis of Remittances to Yemen</h2>
   <div id="chart_7"></div>
   <script>
+    var colorTheme = ['F7D264', 'F57644', 'B45014', '4D3729','EFECE2'];
     var chart_1 = c3.generate({
       bindto: '#chart_1',
       data: {
@@ -69,6 +70,11 @@
           ['Dadaab', 20, 10, 2, 1, 5],
         ],
         type: 'bar',
+        colors: {
+            'Urban': colorTheme[0],
+            'Kakuma': colorTheme[1],
+            'Dadaab': colorTheme[2]
+        },
         groups: [
           ['Urban', 'Kakuma', 'Dadaab']
         ]
@@ -102,7 +108,12 @@
           ['Contribution', 4, 20, 22, 3, 4, 20, 4, 5, 9, 70],
           ['Gap', 2, 5, 6, 5, 1, 7, 10, 3, 8, 50],
         ],
-        type: 'bar'
+        type: 'bar',
+        colors: {
+            Need: colorTheme[0],
+            Contribution: colorTheme[1],
+            Gap: colorTheme[2]
+        }
       },
       axis: {
         x: {
@@ -131,7 +142,10 @@
         columns: [
           ['IDP', 1680, 1526, 2803, 1029]
         ],
-        type: 'spline'
+        type: 'spline',
+        colors: {
+            IDP: colorTheme[0]
+        }
       },
       axis: {
         x: {
@@ -155,6 +169,10 @@
           ['due to protests', 175698],
           ['due to conflict', 94606]
         ],
+        colors: {
+            'due to protests': colorTheme[0],
+            'due to conflict': colorTheme[1]
+        },
         type: 'donut'
       },
         donut: {
@@ -174,6 +192,13 @@
           ['Returness', 228000],
           ['Non-displaced', 13757000]
         ],
+        colors: {
+            'refugees': colorTheme[0],
+            'Migrants & Asylum Seekers': colorTheme[1],
+            'Internal Displaced': colorTheme[2],
+            'Returness': colorTheme[3],
+            'Non-displaced': colorTheme[4]
+        },
         type: 'pie'
       },
       donut: {
@@ -199,6 +224,11 @@
       { "Mechanism":"Abduction", "Period":"Jan-Jun 2013", "Violations":1 }
     ];
     var chart_6 = new dimple.chart(chart_6_container, chart_6_data);
+    chart_6.defaultColors = [
+        new dimple.color('#' + colorTheme[0]),
+        new dimple.color('#' + colorTheme[1]),
+        new dimple.color('#' + colorTheme[2])
+    ];
     chart_6.setBounds(200, 40, 800, 300)
     chart_6.addMeasureAxis("x", "Violations");
     chart_6.addCategoryAxis("y", ["Mechanism", "Period"]);
@@ -212,6 +242,9 @@
         columns: [
           ['millions', 1288, 1295, 1294, 1270, 1283, 1283, 1283, 1322, 1411, 1160, 1526, 1404]
         ],
+        colors: {
+            'millions': colorTheme[0]
+        },
         type: 'area'
       },
       axis: {
