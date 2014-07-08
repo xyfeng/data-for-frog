@@ -1,3 +1,5 @@
+<!-- http://paperjs.org/examples/hit-testing/ -->
+<!-- http://paperjs.org/reference/path/#path-regularpolygon-object -->
 <!DOCTYPE html>
 <html>
 
@@ -92,7 +94,7 @@
         }
       }
 
-      var sys = arbor.ParticleSystem(1000, 400, 1, true, 30, 0.02, 0.6);
+      var sys = arbor.ParticleSystem(2000, 900, 1, true, 30, 0.015, 0.6);
       sys.renderer = myRenderer;
       sys.graft(data);
 
@@ -131,8 +133,16 @@
           dragged = null
         }
       }
+      var hovered;
       tool.onMouseMove = function(event) {
-
+        var hitResult = project.hitTest(event.point, hitOptions);
+        if (!hitResult)
+          return;
+        if (hitResult) {
+          hovered = hitResult.item.node;
+          console.log(hovered.data.label);
+        }
+        return false;
       }
 
     });
