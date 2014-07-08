@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Topics</title>
+  <style>
+    body{
+      margin:0;
+      padding:0;
+      font:12px/17px Arial, sans-serif;
+      background:#fff;
+    }
+    #viewport {
+      width:100%;
+      height:100%;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="viewport" resize></canvas>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+
+  <script src="lib/arbor.js"></script>
+  <script src="lib/arbor-tween.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.9.18/paper-full.min.js"></script>
+
+  <!-- drawing
+  <script src="lib/arbor-graphics.js"></script>
+  <script src="lib/arbor-renderer.js"></script>
+  <script src="data/indicators.js"></script>
+  -->
+  <script src="data/test.js"></script>
+
+  <script>
+    paper.install(window);
+
+    $(function() {
+      paper.setup('viewport');
+      var particleSystem = null;
+      var nodes = {};
+      var edges = {};
+      var myRenderer = {
+        init:  function(system){
+          console.log(system);
+          particleSystem = system;
+          particleSystem.screenSize(window.innerWidth, window.innerHeight);
+          particleSystem.screenPadding(100);
+
+          particleSystem.eachEdge(function(edge, pt1, pt2){
+            var line = new Path.Line({
+              from: [pt1.x, pt1.y],
+              to: [pt2.x, pt2.y],
+              strokeColor: 'black',
+              strokeWidth: 0.2
+            });
+            edges[edge._id] = line;
+          });
+
+          particleSystem.eachNode(function(node, pt){
+            var label = node.data.label||""
+            var path = new Path.RegularPolygon({
+              center: [pt.x, pt.y],
+              sides: 6,
+              radius: 20,
+              strokeColor: 'red',
+              fillColor: '#ffffff'
+            });
+            nodes[node._id] = path;
+            path.node = node;
+          });
+          view.draw();
+        },
+        redraw:function(){
+          particleSystem.eachEdge(function(edge, pt1, pt2){
+            var line = edges[edge._id];
+            var point = line.segments[0].point;
+            point.x = pt1.x;
+            point.y = pt1.y;
+            point = line.segments[1].point;
+            point.x = pt2.x;
+            point.y = pt2.y;
+          });
+          particleSystem.eachNode(function(node, pt){
+            var node = nodes[node._id];
+            node.position = new Point(pt.x, pt.y);
+          });
+          view.draw();
+        }
+      }
+
+      var sys = arbor.ParticleSystem(1000, 400, 1, true, 30, 0.02, 0.6);
+      sys.renderer = myRenderer;
+      sys.graft(data);
+
+  		var tool = new Tool();
+
+      var hitOptions = {
+      	segments: false,
+      	stroke: false,
+      	fill: true,
+      	tolerance: 5
+      };
+      var dragged;
+      tool.onMouseDown = function(event) {
+        dragged = null;
+        var hitResult = project.hitTest(event.point, hitOptions);
+      	if (!hitResult)
+      		return;
+        if (hitResult) {
+      		dragged = hitResult.item.node;
+          dragged.fixed = true;
+          console.log(dragged);
+      	}
+        return false;
+      }
+      tool.onMouseDrag = function(event) {
+        if (dragged !== null){
+          var s = arbor.Point(event.point.x, event.point.y);
+          var p = particleSystem.fromScreen(s);
+          dragged.p = p;
+        }
+      }
+      tool.onMouseUp = function(event) {
+        if (dragged.node !== null){
+          dragged.fixed = false
+          dragged.tempMass = 50
+          dragged = null
+        }
+      }
+      tool.onMouseMove = function(event) {
+
+      }
+
+    });
+  </script>
+
+</body>
+
+</html>
