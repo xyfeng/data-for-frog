@@ -1,105 +1,37 @@
 var data = {
   nodes: {
-    top: {
-      'color': 'dd3333',
-      'shape': 'dot',
-      'label': 'Topics'
+    dat: {
+      'type': 'dataset',
+      'label': 'Dataset'
     },
-    pop: {
-      'color': 'ccddcc',
-      'label': 'Population'
+    org: {
+      'type': 'org',
+      'label': 'Organizition'
     },
-    eco: {
-      'color': 'ccddcc',
-      'label': 'Economic'
+    mem1: {
+      'type': 'creator',
+      'label': 'member'
     },
-    hth: {
-      'color': 'ccddcc',
-      'label': 'Health'
+    mem2: {
+      'type': 'follower',
+      'label': 'member'
     },
-    fos: {
-      'color': 'ccddcc',
-      'label': 'Food Security'
+    mem3: {
+      'type': 'follower',
+      'label': 'member'
     },
-    nut: {
-      'color': 'ccddcc',
-      'label': 'Nutrition'
-    },
-    edu: {
-      'color': 'ccddcc',
-      'label': 'Education'
-    },
-    pro: {
-      'color': 'ccddcc',
-      'label': 'Protection'
-    },
-    wsh: {
-      'color': 'ccddcc',
-      'label': 'Water, Sanitation, and Hygiene'
-    },
-    she: {
-      'color': 'ccddcc',
-      'label': 'Shelter'
-    },
-    log: {
-      'color': 'ccddcc',
-      'label': 'Logistics'
-    },
-    fun: {
-      'color': 'ccddcc',
-      'label': 'Funding'
-    },
-    hum: {
-      'color': 'ccddcc',
-      'label': 'Humanitarian Profile'
-    },
-    att: {
-      'color': 'ccddcc',
-      'label': 'Attribute'
-    },
-    geo: {
-      'color': 'ccddcc',
-      'label': 'Geographic'
-    },
-    oth: {
-      'color': 'ccddcc',
-      'label': 'Other'
-    },
-    item1: {
-      'color': 'ccccdd',
-      'label': 'item 1'
-    },
-    item2: {
-      'color': 'ccccdd',
-      'label': 'item 1'
-    },
-    item3: {
-      'color': 'ccccdd',
-      'label': 'item 1'
+    mem4: {
+      'type': 'follower',
+      'label': 'member'
     }
   },
   edges: {
-    top: {
-      pop: {},
-      eco: {},
-      hth: {},
-      fos: {},
-      nut: {},
-      edu: {},
-      pro: {},
-      wsh: {},
-      she: {},
-      log: {},
-      fun: {},
-      hum: {},
-      att: {},
-      geo: {},
-      oth: {}
-    },
-    pop: {
-      item1: {},
-      item2: {},
-      item3: {}
+    dat: {
+      org: {},
+      mem1: {},
+      mem2: {},
+      mem3: {},
+      mem4: {}
     }
   }
 };
