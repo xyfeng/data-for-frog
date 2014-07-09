@@ -3,7 +3,7 @@ var data = {
     top: {
       'color': 'dd3333',
       'shape': 'dot',
-      'label': '    Topics   '
+      'label': 'Topics'
     },
     pop: {
       'color': 'ccddcc',
