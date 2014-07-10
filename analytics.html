@@ -79,6 +79,10 @@
   <h2>People in need</h2>
   <h3>UNHCR</h3>
   <div id="chart_9"></div>
+  <!-- new chart -->
+  <h2>Food consumption in selected countries</h2>
+  <h3>UN World Food Programme. Food Security Analysis Service / VAM</h3>
+  <div id="chart_10"></div>
   <script>
     var colorTheme = ['1ebfb3','117be1', 'f2645a', '555555','ffd700'];
     var chart_1 = c3.generate({
@@ -345,6 +349,49 @@
           y: {
               show: true
           }
+      }
+    });
+    var chart_10 = c3.generate({
+      bindto: '#chart_10',
+      data: {
+        columns: [
+          ['Poor', 5,4.8,9,16.4,6.4,9.5,1.6,8.4,5.9,2,11.9,9.1,4,10.2,6.5,4.1,22.2],
+          ['Borderline', 18,22.9,17,25,30.0,16.6,3.8,23.7,19.1,11,41.2,18.3,17,12.6,38.5,18.9,22.3]
+        ],
+        type: 'bar',
+        colors: {
+            'Poor': colorTheme[0],
+            'Borderline': colorTheme[1]
+        },
+        groups: [
+          ['Benin','Burundi','Cameroon','Chad','Democratic Republic of Congo','Ethiopia','Ghana','Guinea','Haiti','Laos','Madagascar','Mozambique','Rwanda','Sao Tome and Principe','Sierra Leone','Tanzania','Yemen']
+        ]
+      },
+      axis: {
+        x: {
+          type: 'category',
+          tick: {
+              rotate: 12
+          },
+          categories: ['Benin','Burundi','Cameroon','Chad','DR Congo','Ethiopia','Ghana','Guinea','Haiti','Laos','Madagascar','Mozambique','Rwanda','ST Principe','Sierra Leone','Tanzania','Yemen']
+        },
+        y: {
+          label: {
+            text: '% of households with poor/borderline food consumption',
+            position: 'outer-middle'
+          }
+        }
+      },
+      grid: {
+          x: {
+              show: false
+          },
+          y: {
+              show: true
+          }
+      },
+      legend: {
+          position: 'bottom'
       }
     });
   </script>
