@@ -10,19 +10,19 @@ var data = {
     },
     mem1: {
       'type': 'creator',
-      'label': 'member'
+      'label': 'Creator'
     },
     mem2: {
       'type': 'follower',
-      'label': 'member'
+      'label': 'Follower'
     },
     mem3: {
       'type': 'follower',
-      'label': 'member'
+      'label': 'Follower'
     },
     mem4: {
       'type': 'follower',
-      'label': 'member'
+      'label': 'Follower'
     }
   },
   edges: {

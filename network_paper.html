@@ -157,6 +157,10 @@
         for (var i=0; i<array.length; i++){
           array[i].data.graphic.remove();
         }
+        array = particleSystem.getEdgesFrom(node);
+        for (var i=0; i<array.length; i++){
+          array[i].data.graphic.remove();
+        }
         particleSystem.pruneNode(node);
       }
 
@@ -171,42 +175,155 @@
       }
 
       var removeOthers = function(node) {
-        var edges = particleSystem.getEdgesTo(node);
-        if( edges.length ){
-          var linkNode = edges[0].source;
+        var fromEdges = particleSystem.getEdgesFrom(node);
+        var toEdges = particleSystem.getEdgesTo(node);
+        if(fromEdges.length + toEdges.length == 1){
+          var linkNode;
+          if (fromEdges.length){
+            linkNode = fromEdges[0].target;
+          }
+          else{
+            linkNode = toEdges[0].source;
+          }
           var links = particleSystem.getEdgesFrom(linkNode);
-          if( links.length ){
-            for (var i=0; i<links.length; i++){
-              if(links[i].target !== node) {
-                removeNode(links[i].target);
-              }
+          for (var i=0; i<links.length; i++){
+            if(links[i].target !== node) {
+              removeNode(links[i].target);
             }
           }
+          links = particleSystem.getEdgesTo(linkNode);
+          for (var i=0; i<links.length; i++){
+            if(links[i].source !== node) {
+              removeNode(links[i].source);
+            }
+          }
+          addSome(node);
         }
       }
 
+      var nameCount = 0;
       var addSome = function(node) {
-        var edges = particleSystem.getEdgesFrom(node);
-        if (edges.length == 0){
-          // console.log('add some');
-          var type = node.data.type;
-          if (type === 'creator' || type === 'follower') {
+        // console.log('add some');
+        var type = node.data.type;
+        // console.log(type);
+        if (type === 'creator' || type === 'follower') {
+          var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+          nameCount++;
+          newNode.p.x = node.p.x + .05*Math.random() - .025
+          newNode.p.y = node.p.y + .05*Math.random() - .025
+          var nodeGraphic = createNode('Organizition', 'org', newNode.p.x, newNode.p.y);
+          newNode.data.graphic = nodeGraphic;
+          newNode.data.type = 'org';
+          var edge = particleSystem.addEdge(node, newNode);
+          var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+          edge.data.graphic = edgeGraphic;
 
+          count = Math.floor(Math.random() * 6) + 1;
+          for (var i=0; i<count; i++){
+            //create node
+            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+            nameCount ++;
+            newNode.p.x = node.p.x + .05*Math.random() - .025
+            newNode.p.y = node.p.y + .05*Math.random() - .025
+            var nodeGraphic = createNode('Dataset', 'dataset', newNode.p.x, newNode.p.y);
+            newNode.data.graphic = nodeGraphic;
+            newNode.data.type = 'dataset';
+            //create edge
+            var edge = particleSystem.addEdge(node, newNode);
+            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+            edge.data.graphic = edgeGraphic;
           }
-          else if(type === 'org'){
-            // var count = Math.floor(Math.random() * 3) + 1;
-            // for (var i=0; i<count; i++){
-            //   //create node
-            //   var member = particleSystem.addNode(node.name + '_' + i);
-            //   member.p.x = node.p.x + .05*Math.random() - .025
-            //   member.p.y = node.p.y + .05*Math.random() - .025
-            //   var nodeGraphic = createNode('member', 'creater', member.p.x, member.p.y);
-            //   node.data.graphic = nodeGraphic;
-            //   //create edge
-            //   var edge = particleSystem.addEdge(node, member);
-            //   var edgeGraphic = createEdge(node.p.x, node.p.y, member.p.x, member.p.y);
-            //   edge.data.graphic = edgeGraphic;
-            // }
+        }
+        else if(type === 'org'){
+          var count = Math.floor(Math.random() * 3) + 1;
+          for (var i=0; i<count; i++){
+            //create node
+            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+            nameCount ++;
+            newNode.p.x = node.p.x + .05*Math.random() - .025
+            newNode.p.y = node.p.y + .05*Math.random() - .025
+            var nodeGraphic = createNode('Member', 'creator', newNode.p.x, newNode.p.y);
+            newNode.data.graphic = nodeGraphic;
+            newNode.data.type = 'creator';
+            //create edge
+            var edge = particleSystem.addEdge(node, newNode);
+            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+            edge.data.graphic = edgeGraphic;
+          }
+          count = Math.floor(Math.random() * 6) + 1;
+          for (var i=0; i<count; i++){
+            //create node
+            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+            nameCount ++;
+            newNode.p.x = node.p.x + .05*Math.random() - .025
+            newNode.p.y = node.p.y + .05*Math.random() - .025
+            var nodeGraphic = createNode('Follower', 'follower', newNode.p.x, newNode.p.y);
+            newNode.data.graphic = nodeGraphic;
+            newNode.data.type = 'follower';
+            //create edge
+            var edge = particleSystem.addEdge(node, newNode);
+            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+            edge.data.graphic = edgeGraphic;
+          }
+          count = Math.floor(Math.random() * 9) + 1;
+          for (var i=0; i<count; i++){
+            //create node
+            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+            nameCount++;
+            newNode.p.x = node.p.x + .05*Math.random() - .025
+            newNode.p.y = node.p.y + .05*Math.random() - .025
+            var nodeGraphic = createNode('Dataset', 'dataset', newNode.p.x, newNode.p.y);
+            newNode.data.graphic = nodeGraphic;
+            newNode.data.type = 'dataset';
+            //create edge
+            var edge = particleSystem.addEdge(node, newNode);
+            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+            edge.data.graphic = edgeGraphic;
+          }
+        }
+        else if(type === 'dataset'){
+          var FOUND_ORG = false;
+          particleSystem.eachNode(function(node, pt){
+            if( node.data.type === 'org')
+              FOUND_ORG = true;
+          });
+          if(!FOUND_ORG){
+            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+            nameCount++;
+            newNode.p.x = node.p.x + .05*Math.random() - .025
+            newNode.p.y = node.p.y + .05*Math.random() - .025
+            var nodeGraphic = createNode('Organizition', 'org', newNode.p.x, newNode.p.y);
+            newNode.data.graphic = nodeGraphic;
+            newNode.data.type = 'org';
+            var edge = particleSystem.addEdge(node, newNode);
+            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+            edge.data.graphic = edgeGraphic;
+          }
+          var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+          nameCount++;
+          newNode.p.x = node.p.x + .05*Math.random() - .025
+          newNode.p.y = node.p.y + .05*Math.random() - .025
+          var nodeGraphic = createNode('Creator', 'creator', newNode.p.x, newNode.p.y);
+          newNode.data.graphic = nodeGraphic;
+          newNode.data.type = 'creator';
+          //create edge
+          var edge = particleSystem.addEdge(node, newNode);
+          var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+          edge.data.graphic = edgeGraphic;
+          count = 3;
+          for (var i=0; i<count; i++){
+            //create node
+            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+            nameCount++;
+            newNode.p.x = node.p.x + .05*Math.random() - .025
+            newNode.p.y = node.p.y + .05*Math.random() - .025
+            var nodeGraphic = createNode('Follower', 'follower', newNode.p.x, newNode.p.y);
+            newNode.data.graphic = nodeGraphic;
+            newNode.data.type = 'follower';
+            //create edge
+            var edge = particleSystem.addEdge(node, newNode);
+            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
+            edge.data.graphic = edgeGraphic;
           }
         }
       }
@@ -268,29 +385,6 @@
           else{
             // console.log('click');
             removeOthers(clicked);
-            addSome(clicked);
-            // var array = particleSystem.getEdgesFrom(clicked);
-            // if (array.length > 0){
-            //   // if (particleSystem.getEdgesTo(clicked).length){
-            //     removeNodeChildren(clicked);
-            //   // }
-            // }
-            // else{
-            //   //add random nodes
-            //   var count = Math.floor(Math.random() * 6) + 1;
-            //   for (var i=0; i<count; i++){
-            //     //create node
-            //     var node = particleSystem.addNode(clicked.name + '_' + i);
-            //     node.p.x = clicked.p.x + .05*Math.random() - .025
-            //     node.p.y = clicked.p.y + .05*Math.random() - .025
-            //     var nodeGraphic = createNode('item', 'dataset', node.p.x, node.p.y);
-            //     node.data.graphic = nodeGraphic;
-            //     //create edge
-            //     var edge = particleSystem.addEdge(clicked, node);
-            //     var edgeGraphic = createEdge(clicked.p.x, clicked.p.y, node.p.x, node.p.y);
-            //     edge.data.graphic = edgeGraphic;
-            //   }
-            // }
             clicked.fixed = false;
             clicked = null;
           }
