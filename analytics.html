@@ -31,9 +31,20 @@
   }
   h2 {
     margin-top: 60px;
+    margin-bottom: 0;
     font-family: 'Oswald', Arial;
     font-weight: 400;
     /*text-transform: uppercase;*/
+  }
+  h3{
+    font-weight: 300;
+    font-size: 12px;
+    font-family: 'Oswald', Arial;
+    margin:0;
+    padding:0;
+  }
+  .c3{
+    margin-top: 20px;
   }
   </style>
 </head>
@@ -62,9 +73,11 @@
   <div id="chart_7"></div>
   <!-- new chart -->
   <h2>Total Number of Disasters</h2>
+  <h3>Centre for Research on the Epidemiology of Disasters</h3>
   <div id="chart_8"></div>
   <!-- new chart -->
   <h2>People in need</h2>
+  <h3>UNHCR</h3>
   <div id="chart_9"></div>
   <script>
     var colorTheme = ['1ebfb3','117be1', 'f2645a', '555555','ffd700'];
@@ -274,7 +287,7 @@
         columns: [
           ['Disasters', 36, 31, 52, 49, 43, 57, 79, 78, 78, 108, 74, 75, 82, 77]
         ],
-        type: 'spline',
+        type: 'area-spline',
         colors: {
             'Disasters': colorTheme[0]
         }
@@ -319,6 +332,9 @@
           label: {
             text: '',
             position: 'outer-top'
+          },
+          tick: {
+            format: d3.format(",")
           }
         }
       },
