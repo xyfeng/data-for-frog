@@ -59,6 +59,12 @@
   <!-- new chart -->
   <h2>Trend Analysis of Remittances to Yemen</h2>
   <div id="chart_7"></div>
+  <!-- new chart -->
+  <h2>Total Number of Disasters</h2>
+  <div id="chart_8"></div>
+  <!-- new chart -->
+  <h2>Chart 2</h2>
+  <div id="chart_9"></div>
   <script>
     var colorTheme = ['1ebfb3','117be1', 'f2645a', '555555','ffd700'];
     var chart_1 = c3.generate({
@@ -255,6 +261,62 @@
         y: {
           label: {
             text: 'Millions',
+            position: 'outer-top'
+          }
+        }
+      },
+    });
+
+    var chart_8 = c3.generate({
+      bindto: '#chart_8',
+      data: {
+        columns: [
+          ['Disasters', 36, 31, 52, 49, 43, 57, 79, 78, 78, 108, 74, 75, 82, 77, 17]
+        ],
+        type: 'spline',
+        colors: {
+            'Disasters': colorTheme[0]
+        }
+      },
+      axis: {
+        x: {
+          type: 'category',
+          categories: ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014']
+        }
+      },
+      grid: {
+          x: {
+              show: false
+          },
+          y: {
+              show: true
+          }
+      }
+    });
+
+    var chart_9 = c3.generate({
+      bindto: '#chart_9',
+      data: {
+        columns: [
+          ['Refugees', 12129572,12116835,10594055,9592795,9568144,8661988,9877703,11390930,10489812,10396538,10549679,10404806,10497957,11699638],
+          ['Asylum seekers', 947926,943854,1093755,996428,885249,802174,741291,741110,825043,989169,837445,895284,928226,1168273],
+          ['Internally displaced', 5998501,5096502,4646641,4181701,5426539,6616791,12794268,13740317,14442227,15628057,14697804,15473378,17670368,23925555]
+        ],
+        colors: {
+            'Refugees': colorTheme[0],
+            'Asylum seekers': colorTheme[1],
+            'Internally displaced': colorTheme[2]
+        },
+        type: 'area'
+      },
+      axis: {
+        x: {
+          type: 'category',
+          categories: ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013']
+        },
+        y: {
+          label: {
+            text: '',
             position: 'outer-top'
           }
         }
