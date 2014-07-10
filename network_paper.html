@@ -31,6 +31,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.9.18/paper-full.min.js"></script>
 
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js"></script>
+
   <!-- drawing
   <script src="lib/arbor-graphics.js"></script>
   <script src="lib/arbor-renderer.js"></script>
@@ -46,9 +48,9 @@
       var particleSystem = null;
       var edgeGroup = new Group();
       var nodeGroup = new Group();
+      var tweenDuration = 0.5;
       var myRenderer = {
         init:  function(system){
-          console.log(system);
           particleSystem = system;
           particleSystem.screenSize(window.innerWidth, window.innerHeight);
           particleSystem.screenPadding(100);
@@ -59,30 +61,70 @@
           });
 
           particleSystem.eachNode(function(node, pt){
-            var label = node.data.label||""
+            var label = node.data.label||"";
             var nodeGraphic = createNode(label, node.data.type, pt.x, pt.y);
             node.data.graphic = nodeGraphic;
+            node.data.alpha = 1.0;
           });
           view.draw();
         },
         redraw:function(){
           particleSystem.eachEdge(function(edge, pt1, pt2){
             var line = edge.data.graphic;
-            var point = line.segments[0].point;
-            point.x = pt1.x;
-            point.y = pt1.y;
-            point = line.segments[1].point;
-            point.x = pt2.x;
-            point.y = pt2.y;
+            if(line){
+              var point = line.segments[0].point;
+              point.x = pt1.x;
+              point.y = pt1.y;
+              point = line.segments[1].point;
+              point.x = pt2.x;
+              point.y = pt2.y;
+            }
           });
           particleSystem.eachNode(function(node, pt){
-            node.data.graphic.position = new Point(pt.x, pt.y);
+            var shape = node.data.graphic;
+            if(shape){
+              node.data.graphic.position = new Point(pt.x, pt.y);
+              // node.data.graphic.opacity = node.data.alpha;
+            }
           });
           view.draw();
         }
       }
 
-      var sys = arbor.ParticleSystem(100, 900, 1, true, 30, 0.015, 0.6);
+      var sys = arbor.ParticleSystem(100, 2000, 1, true, 30, 0.015, 0.4);
+      console.log(sys);
+      var gui = new dat.GUI();
+      gui.closed = true;
+      gui.add(sys.parameters(), 'repulsion', 0, 2000).onChange(function(value) {
+        sys.parameters({
+          repulsion:value
+        });
+      });
+      gui.add(sys.parameters(), 'stiffness', 0, 2000).onChange(function(value) {
+        sys.parameters({
+          stiffness:value
+        });
+      });
+      gui.add(sys.parameters(), 'friction', 0, 1).onChange(function(value) {
+        sys.parameters({
+          friction:value
+        });
+      });
+      gui.add(sys.parameters(), 'gravity', { False: false, True: true }).onChange(function(value) {
+        sys.parameters({
+          gravity:value
+        });
+      });
+      gui.add(sys.parameters(), 'dt', 0, 0.05).onChange(function(value) {
+        sys.parameters({
+          dt:value
+        });
+      });
+      gui.add(sys.parameters(), 'precision', 0, 1).onChange(function(value) {
+        sys.parameters({
+          precision:value
+        });
+      });
       sys.renderer = myRenderer;
       sys.graft(data);
 
@@ -202,83 +244,45 @@
       }
 
       var nameCount = 0;
+      var addOne = function(node, name, type){
+        var newNode = particleSystem.addNode(node.name + '_' + nameCount);
+        nameCount++;
+        newNode.p = arbor.Point(node.p.x + .05*Math.random() - .025, node.p.y + .05*Math.random() - .025);
+        newNode.data.alpha = 0.0;
+        particleSystem.tweenNode(node, tweenDuration, { alpha:1.0 });
+        var nodeGraphic = createNode(name, type, -1000, -1000);
+        newNode.data.graphic = nodeGraphic;
+        newNode.data.type = type;
+        var edge = particleSystem.addEdge(node, newNode);
+        var edgeGraphic = createEdge(null,null);
+        edge.data.graphic = edgeGraphic;
+        return newNode;
+      }
+
       var addSome = function(node) {
         // console.log('add some');
         var type = node.data.type;
         // console.log(type);
         if (type === 'creator' || type === 'follower') {
-          var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-          nameCount++;
-          newNode.p.x = node.p.x + .05*Math.random() - .025
-          newNode.p.y = node.p.y + .05*Math.random() - .025
-          var nodeGraphic = createNode('Organizition', 'org', newNode.p.x, newNode.p.y);
-          newNode.data.graphic = nodeGraphic;
-          newNode.data.type = 'org';
-          var edge = particleSystem.addEdge(node, newNode);
-          var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-          edge.data.graphic = edgeGraphic;
+          addOne(node, 'Organizition', 'org');
 
           count = Math.floor(Math.random() * 6) + 1;
           for (var i=0; i<count; i++){
-            //create node
-            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-            nameCount ++;
-            newNode.p.x = node.p.x + .05*Math.random() - .025
-            newNode.p.y = node.p.y + .05*Math.random() - .025
-            var nodeGraphic = createNode('Dataset', 'dataset', newNode.p.x, newNode.p.y);
-            newNode.data.graphic = nodeGraphic;
-            newNode.data.type = 'dataset';
-            //create edge
-            var edge = particleSystem.addEdge(node, newNode);
-            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-            edge.data.graphic = edgeGraphic;
+            addOne(node, 'Dataset', 'dataset');
           }
         }
         else if(type === 'org'){
           var count = Math.floor(Math.random() * 3) + 1;
           for (var i=0; i<count; i++){
-            //create node
-            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-            nameCount ++;
-            newNode.p.x = node.p.x + .05*Math.random() - .025
-            newNode.p.y = node.p.y + .05*Math.random() - .025
-            var nodeGraphic = createNode('Member', 'creator', newNode.p.x, newNode.p.y);
-            newNode.data.graphic = nodeGraphic;
-            newNode.data.type = 'creator';
-            //create edge
-            var edge = particleSystem.addEdge(node, newNode);
-            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-            edge.data.graphic = edgeGraphic;
+            addOne(node, 'Member', 'creator');
           }
           count = Math.floor(Math.random() * 6) + 1;
           for (var i=0; i<count; i++){
-            //create node
-            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-            nameCount ++;
-            newNode.p.x = node.p.x + .05*Math.random() - .025
-            newNode.p.y = node.p.y + .05*Math.random() - .025
-            var nodeGraphic = createNode('Follower', 'follower', newNode.p.x, newNode.p.y);
-            newNode.data.graphic = nodeGraphic;
-            newNode.data.type = 'follower';
-            //create edge
-            var edge = particleSystem.addEdge(node, newNode);
-            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-            edge.data.graphic = edgeGraphic;
+            addOne(node, 'Follower', 'follower');
           }
           count = Math.floor(Math.random() * 9) + 1;
           for (var i=0; i<count; i++){
-            //create node
-            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-            nameCount++;
-            newNode.p.x = node.p.x + .05*Math.random() - .025
-            newNode.p.y = node.p.y + .05*Math.random() - .025
-            var nodeGraphic = createNode('Dataset', 'dataset', newNode.p.x, newNode.p.y);
-            newNode.data.graphic = nodeGraphic;
-            newNode.data.type = 'dataset';
-            //create edge
-            var edge = particleSystem.addEdge(node, newNode);
-            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-            edge.data.graphic = edgeGraphic;
+            addOne(node, 'Dataset', 'dataset');
           }
         }
         else if(type === 'dataset'){
@@ -288,42 +292,14 @@
               FOUND_ORG = true;
           });
           if(!FOUND_ORG){
-            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-            nameCount++;
-            newNode.p.x = node.p.x + .05*Math.random() - .025
-            newNode.p.y = node.p.y + .05*Math.random() - .025
-            var nodeGraphic = createNode('Organizition', 'org', newNode.p.x, newNode.p.y);
-            newNode.data.graphic = nodeGraphic;
-            newNode.data.type = 'org';
-            var edge = particleSystem.addEdge(node, newNode);
-            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-            edge.data.graphic = edgeGraphic;
+            addOne(node, 'Organizition', 'org');
           }
-          var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-          nameCount++;
-          newNode.p.x = node.p.x + .05*Math.random() - .025
-          newNode.p.y = node.p.y + .05*Math.random() - .025
-          var nodeGraphic = createNode('Creator', 'creator', newNode.p.x, newNode.p.y);
-          newNode.data.graphic = nodeGraphic;
-          newNode.data.type = 'creator';
-          //create edge
-          var edge = particleSystem.addEdge(node, newNode);
-          var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-          edge.data.graphic = edgeGraphic;
+          for (var i=0; i<count; i++){
+            addOne(node, 'Creator', 'creator');
+          }
           count = 3;
           for (var i=0; i<count; i++){
-            //create node
-            var newNode = particleSystem.addNode(node.name + '_' + nameCount);
-            nameCount++;
-            newNode.p.x = node.p.x + .05*Math.random() - .025
-            newNode.p.y = node.p.y + .05*Math.random() - .025
-            var nodeGraphic = createNode('Follower', 'follower', newNode.p.x, newNode.p.y);
-            newNode.data.graphic = nodeGraphic;
-            newNode.data.type = 'follower';
-            //create edge
-            var edge = particleSystem.addEdge(node, newNode);
-            var edgeGraphic = createEdge(node.p.x, node.p.y, newNode.p.x, newNode.p.y);
-            edge.data.graphic = edgeGraphic;
+            addOne(node, 'Follower', 'follower');
           }
         }
       }
