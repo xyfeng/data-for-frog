@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset=utf-8 />
+  <title>Components</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <!-- jquery -->
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <!-- purl -->
+  <script src='lib/purl.js'></script>
+  <!-- d3 -->
+  <script src="lib/d3.v3.min.js"></script>
+  <!-- c3 -->
+  <script src='lib/c3.js'></script>
+  <link href='lib/c3.css' rel='stylesheet' />
+  <!-- fonts -->
+  <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
+
+  <style>
+  body{
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-family: Arial;
+  }
+  h2 {
+    position: absolute;
+    width: 100%;
+    top: 0px;
+    font-family: 'Oswald', Arial;
+    font-weight: 400;
+    font-size: 18px;
+  }
+  h3{
+    position: absolute;
+    width: 100%;
+    top: 30px;
+    font-weight: 300;
+    font-size: 12px;
+    font-family: 'Oswald', Arial;
+    padding:0;
+  }
+  .chart {
+    margin-top: 72px;
+  }
+  .c3-tooltip{
+    opacity: 1;
+  }
+  .c3-tooltip th{
+    background-color: #000;
+  }
+  </style>
+</head>
+
+<body>
+  <h2 class='chart_title'>People In Need</h2>
+  <h3 class='chart_subtitle'>UNHCR</h3>
+  <div class="chart"></div>
+  <script>
+    var url = $.url(window.location.href);
+    var colorThemes = [
+      ['1ebfb3','117be1', 'f2645a', '555555','ffd700'],
+      ['705A6B', 'A68580','D1BA94', '8DD9AA','C9F59F'],
+      ['3FCFC1','F22475', 'F4EB63','A8C078', '7F8183']
+    ];
+    var colorIndex = url.param('color')?parseInt(url.param('color')):0;
+    var chartType = url.param('type')?url.param('type'):'area';
+    var title = url.param('title')?url.param('title'):'Title';
+    var subtitle = url.param('subtitle')?url.param('subtitle'):'Subtitle';
+    var from = url.param('from')?parseInt(url.param('from')):0;
+    var to = url.param('to')?parseInt(url.param('to')):1;
+    var show_legend = url.param('sl')?Boolean(url.param('sl')):true;
+    var show_y_grid = url.param('syg')?Boolean(url.param('syg')):true;
+    var y_tick_format = url.param('ytf')?url.param('ytf'):'default';
+
+    $('.chart_title').html(title);
+    $('.chart_subtitle').html(subtitle);
+
+    var data_set = [
+      [12129572,12116835,10594055,9592795,9568144,8661988,9877703,11390930,10489812,10396538,10549679,10404806,10497957,11699638],
+      [947926,943854,1093755,996428,885249,802174,741291,741110,825043,989169,837445,895284,928226,1168273],
+      [5998501,5096502,4646641,4181701,5426539,6616791,12794268,13740317,14442227,15628057,14697804,15473378,17670368,23925555]
+    ];
+    var data_title = ['Refugees', 'Asylum seekers', 'Internally displaced'];
+    var data_cat, data_all_cat = ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013'];
+
+    var data = [];
+
+    var getDataFromRange = function(from, to){
+      var result = [];
+      for(var i=0; i<data_set.length; i++){
+        var one = [data_title[i]];
+        for(var j=from; j<to; j++){
+          one.push(data_set[i][j]);
+        }
+        result.push(one);
+      }
+      data_cat = [];
+      for(var j=from; j<to; j++){
+        data_cat.push(data_all_cat[j]);
+      }
+      return result;
+    }
+
+    var data = getDataFromRange(from, to);
+
+    var chart_config = {
+      bindto: '.chart',
+      color: {
+        pattern: colorThemes[colorIndex]
+      },
+      data: {
+        columns: data,
+        type: chartType
+      },
+      axis: {
+        x: {
+          type: 'category',
+          tick: {},
+          categories: data_cat
+        },
+        y: {
+          label: {
+            text: '',
+            position: 'outer-top'
+          },
+          tick: {
+          }
+        }
+      },
+      grid: {
+          x: {
+              show: false
+          },
+          y: {
+              show: show_y_grid
+          }
+      },
+      tooltip: {
+          grouped: true
+      },
+      padding: {
+        top: 0,
+        bottom: 0
+      }
+    }
+    if(y_tick_format === 'comma'){
+      chart_config.axis.y.tick.format = d3.format(",");
+    }
+    else if(y_tick_format === 'dollar'){
+      chart_config.axis.y.tick.format = d3.format("$,");
+    }
+
+    var chart = c3.generate(chart_config);
+    if(!show_legend){
+        chart.legend.hide();
+    }
+  </script>
+</body>
+
+</html>

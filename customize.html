@@ -7,17 +7,13 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <!-- jquery -->
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <!-- mapbox -->
-  <script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
-  <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js'></script>
+  <!-- purl -->
+  <script src='lib/purl.js'></script>
   <!-- d3 -->
-  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="lib/d3.v3.min.js"></script>
   <!-- c3 -->
-  <script src='https://rawgit.com/masayuki0812/c3/master/c3.js'></script>
-  <link href='https://rawgit.com/masayuki0812/c3/master/c3.css' rel='stylesheet' />
-  <!-- dimplejs -->
-  <script src="http://dimplejs.org/dist/dimple.v2.0.0.min.js"></script>
+  <script src='lib/c3.js'></script>
+  <link href='lib/c3.css' rel='stylesheet' />
   <!-- fonts -->
   <link href='http://fonts.googleapis.com/css?family=Oswald:400,300,700' rel='stylesheet' type='text/css'>
 
@@ -94,6 +90,24 @@
   .range-label {
     width: 60px;
     display: inline-block;
+  }
+  .embed-label-group {
+    text-align: left;
+  }
+  .embed-label-group label{
+    margin: 0 10px 0 10px;
+    display: inline-block;
+  }
+  .embed-label {
+    width: 60px;
+    font-size:12px;
+    display: inline-block;
+  }
+  .embed.btn {
+    margin: 0 0 0 40px;
+  }
+  .embed-code {
+    margin: 10px 0 0 0;
   }
   .range-slider {
   }
@@ -238,6 +252,18 @@
               </div>
             </div>
           </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">Embed</label>
+            <div class="col-sm-10">
+              <div class="embed-label-group">
+                <input class="embed-label width form-control" type="text" placeholder="width" value="600">
+                <label>x</label>
+                <input class="embed-label height form-control" type="text" placeholder="height" value="400">
+                <button type="button" class="embed btn btn-info">Embed</button>
+              </div>
+              <textarea class="embed-code form-control" rows="2"></textarea>
+            </div>
+          </div>
         </form>
       </div>
     </div>
@@ -324,6 +350,14 @@
       chart = c3.generate(chart_config);
     });
 
+    $('#demo .embed.btn').on('click', function(){
+      var width = $('#demo .embed-label.width').val();
+      var height = $('#demo .embed-label.height').val();
+      var chart_type = $('#demo .chart-display input').val();
+      var code = '<iframe src="xyfeng.github.io/data-for-frog/embed.html?color='+colorIndex+'&type='+chart_type+'&from='+rangeFrom+'&to='+rangeTo+'" width="'+width+'" height="'+height+'" marginwidth="0" marginheight="0" scrolling="no"></iframe>'
+      $('#demo .embed-code').text(code);
+    });
+
     var colorIndex = 0;
     var colorThemes = [
       ['1ebfb3','117be1', 'f2645a', '555555','ffd700'],
@@ -351,6 +385,7 @@
     var data_title = ['Refugees', 'Asylum seekers', 'Internally displaced'];
     var data_cat, data_all_cat = ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013'];
 
+    var rangeFrom, rangeTo;
     var data = [];
 
     var getDataFromRange = function(from, to){
@@ -368,8 +403,9 @@
       }
       return result;
     }
-
-    var data = getDataFromRange(0, data_set[0].length);
+    rangeFrom = 0;
+    rangeTo = data_set[0].length;
+    var data = getDataFromRange(rangeFrom, rangeTo);
 
     var range_slider = $('#demo .range-slider').noUiSlider({
       start: [ 0, data_cat.length ],
@@ -417,7 +453,6 @@
         $('#demo .range-label.right').val( data_all_cat[to] );
     	},
     	set: function(){
-        console.log('11');
         var result = $(this).val();
         var from = parseInt(result[0]);
         var to = parseInt(result[1]);
@@ -425,6 +460,8 @@
         chart_config.data.columns = data;
         chart_config.axis.x.categories = data_cat;
         chart = c3.generate(chart_config);
+        rangeFrom = from;
+        rangeTo = to;
     	}
     });
 
