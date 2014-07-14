@@ -55,6 +55,12 @@
   .c3{
     margin-top: 20px;
   }
+  .c3-tooltip{
+    opacity: 1;
+  }
+  .c3-tooltip th{
+    background-color: #000;
+  }
   #demo .chart{
     margin: 0 0 50px 0;
   }
@@ -77,14 +83,16 @@
     float: left;
     margin-right: 20px;
   }
+  .range-label-group {
+    text-align: left;
+  }
+  .range-label-group label{
+    margin: 0 10px 0 10px;
+    display: inline-block;
+  }
   .range-label {
-    font-size: 10px;
-  }
-  .range-label.pull-left {
-    margin: 10px 0 0 -12px;
-  }
-  .range-label.pull-right {
-    margin: 10px -12px 0 0;
+    width: 60px;
+    display: inline-block;
   }
   .range-slider {
   }
@@ -171,9 +179,12 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">Range</label>
             <div class="col-sm-10">
-            <div class="range-slider"></div>
-              <label class="range-label pull-left"></label>
-              <label class="range-label pull-right"></label>
+              <div class="range-label-group">
+                <input class="range-label left form-control" type="text" placeholder="2000">
+                <label>to</label>
+                <input class="range-label right form-control" type="text" placeholder="2013">
+              </div>
+              <div class="range-slider"></div>
             </div>
           </div>
           <div class="form-group">
@@ -269,6 +280,12 @@
       $this = $(this);
       var type = $this.val();
       chart_config.data.type = type;
+      if(type === 'bar'){
+        $('line.c3-xgrid-focus').hide();
+      }
+      else{
+        $('line.c3-xgrid-focus').show();
+      }
       chart.transform(type);
     });
     $('#demo .y-grids-display input').on('click', function(){
@@ -361,18 +378,45 @@
         'max': data_cat.length
       }
     });
-    $('#demo .range-label.pull-left').html(data_cat[0]);
-    $('#demo .range-label.pull-right').html(data_cat[data_cat.length-1]);
+    $('#demo .range-label.left').attr('placeholder', data_cat[0]).val( data_cat[0] ).on('change',function(){
+      var $this = $(this);
+      var value = $this.val();
+      var from = data_all_cat.indexOf(value);
+      var toValue = $('#demo .range-label.right').val();
+      var to = data_all_cat.indexOf(toValue);
+      if( from>=0 && to>=0 && from < to)
+      {
+        range_slider.val([from, to+1],{ set: true });
+      }
+      else{
+        $this.val('');
+      }
+    });
+    $('#demo .range-label.right').attr('placeholder', data_cat[data_cat.length-1]).val( data_cat[data_cat.length-1] ).on('change',function(){
+      var $this = $(this);
+      var value = $this.val();
+      var to = data_all_cat.indexOf(value);
+      var fromValue = $('#demo .range-label.left').val();
+      var from = data_all_cat.indexOf(fromValue);
+      if( from>=0 && to>=0 && from < to)
+      {
+        range_slider.val([from, to+1],{ set: true });
+      }
+      else{
+        $this.val('');
+      }
+    });
 
     range_slider.on({
     	slide: function(){
         var result = $(this).val();
         var from = parseInt(result[0]);
         var to = parseInt(result[1]);
-        $('#demo .range-label.pull-left').html(data_cat[from]);
-        $('#demo .range-label.pull-right').html(data_cat[to]);
+        $('#demo .range-label.left').val( data_all_cat[from] );
+        $('#demo .range-label.right').val( data_all_cat[to] );
     	},
     	set: function(){
+        console.log('11');
         var result = $(this).val();
         var from = parseInt(result[0]);
         var to = parseInt(result[1]);
@@ -415,6 +459,9 @@
           y: {
               show: true
           }
+      },
+      tooltip: {
+          grouped: true
       }
       // zoom:{
       //   enabled: true
