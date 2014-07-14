@@ -70,8 +70,8 @@
     var subtitle = url.param('subtitle')?url.param('subtitle'):'Subtitle';
     var from = url.param('from')?parseInt(url.param('from')):0;
     var to = url.param('to')?parseInt(url.param('to')):1;
-    var show_legend = url.param('sl')?Boolean(url.param('sl')):true;
-    var show_y_grid = url.param('syg')?Boolean(url.param('syg')):true;
+    var show_legend = url.param('sl')?url.param('sl')==='true':true;
+    var show_y_grid = url.param('syg')?url.param('syg')==='true':true;
     var y_tick_format = url.param('ytf')?url.param('ytf'):'default';
 
     $('.chart_title').html(title);

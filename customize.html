@@ -261,7 +261,7 @@
                 <input class="embed-label height form-control" type="text" placeholder="height" value="400">
                 <button type="button" class="embed btn btn-info">Embed</button>
               </div>
-              <textarea class="embed-code form-control" rows="2"></textarea>
+              <textarea class="embed-code form-control" rows="3"></textarea>
             </div>
           </div>
         </form>
@@ -353,9 +353,29 @@
     $('#demo .embed.btn').on('click', function(){
       var width = $('#demo .embed-label.width').val();
       var height = $('#demo .embed-label.height').val();
-      var chart_type = $('#demo .chart-display input').val();
-      var code = '<iframe src="xyfeng.github.io/data-for-frog/embed.html?color='+colorIndex+'&type='+chart_type+'&from='+rangeFrom+'&to='+rangeTo+'" width="'+width+'" height="'+height+'" marginwidth="0" marginheight="0" scrolling="no"></iframe>'
-      $('#demo .embed-code').text(code);
+      var chart_type = $('#demo .chart-display input:checked').val();
+      var title = $( "#demo .chart_title" ).html();
+      var subtitle = $( "#demo .chart_subtitle" ).html();
+      var show_legend = $('#demo .legend-display input:checked').val();
+      if(show_legend === 'show'){
+        show_legend = 'true';
+      }
+      else{
+        show_legend = 'false';
+      }
+      var show_y_grid = $('#demo .y-grids-display input:checked').val();
+      if(show_y_grid === 'show'){
+        show_y_grid = 'true';
+      }
+      else{
+        show_y_grid = 'false';
+      }
+      var y_tick_format = $('#demo .y-tick-format input:checked').val();
+      var code = '<iframe src="http://xyfeng.github.io/data-for-frog/embed.html?title='
+        +title+'&subtitle='+subtitle+'&sl='+show_legend+'&syg='+show_y_grid+'&color='
+        +colorIndex+'&type='+chart_type+'&from='+rangeFrom+'&to='+rangeTo+'&ytf='+y_tick_format+'" width="'
+        +width+'" height="'+height+'" marginwidth="0" marginheight="0" scrolling="no"></iframe>'
+      $('#demo .embed-code').val(code);
     });
 
     var colorIndex = 0;
