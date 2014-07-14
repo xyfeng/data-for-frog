@@ -77,6 +77,17 @@
     float: left;
     margin-right: 20px;
   }
+  .range-label {
+    font-size: 10px;
+  }
+  .range-label.pull-left {
+    margin: 10px 0 0 -12px;
+  }
+  .range-label.pull-right {
+    margin: 10px -12px 0 0;
+  }
+  .range-slider {
+  }
   .noUi-target{
     border: none;
     background: #efefef;
@@ -160,7 +171,9 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">Range</label>
             <div class="col-sm-10">
-              <div class="range-slider"></div>
+            <div class="range-slider"></div>
+              <label class="range-label pull-left"></label>
+              <label class="range-label pull-right"></label>
             </div>
           </div>
           <div class="form-group">
@@ -348,15 +361,26 @@
         'max': data_cat.length
       }
     });
+    $('#demo .range-label.pull-left').html(data_cat[0]);
+    $('#demo .range-label.pull-right').html(data_cat[data_cat.length-1]);
 
-    range_slider.change(function(){
-      var result = $(this).val();
-      var from = parseInt(result[0]);
-      var to = parseInt(result[1]);
-      data = getDataFromRange(from, to);
-      chart_config.data.columns = data;
-      chart_config.axis.x.categories = data_cat;
-      chart = c3.generate(chart_config);
+    range_slider.on({
+    	slide: function(){
+        var result = $(this).val();
+        var from = parseInt(result[0]);
+        var to = parseInt(result[1]);
+        $('#demo .range-label.pull-left').html(data_cat[from]);
+        $('#demo .range-label.pull-right').html(data_cat[to]);
+    	},
+    	set: function(){
+        var result = $(this).val();
+        var from = parseInt(result[0]);
+        var to = parseInt(result[1]);
+        data = getDataFromRange(from, to);
+        chart_config.data.columns = data;
+        chart_config.axis.x.categories = data_cat;
+        chart = c3.generate(chart_config);
+    	}
     });
 
     var chart_config = {
