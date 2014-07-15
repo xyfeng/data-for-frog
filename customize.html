@@ -471,7 +471,7 @@
         var from = parseInt(result[0]);
         var to = parseInt(result[1]);
         $('#demo .range-label.left').val( data_all_cat[from] );
-        $('#demo .range-label.right').val( data_all_cat[to] );
+        $('#demo .range-label.right').val( data_all_cat[to-1] );
     	},
     	set: function(){
         var result = $(this).val();
